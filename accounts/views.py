@@ -2,9 +2,7 @@ from django.http import Http404
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import viewsets, status, views
-from .models import User, Company, Weight
-from competitions.models import Competition, CompetitionType
-from competitions import serializers as competitions_serializer
+from .models import User, Company, Weight, Tara
 from accounts import serializers as accounts_serializers
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
@@ -62,6 +60,37 @@ class WeightsDetailsViews(views.APIView):
         account.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class CompanyViews(views.APIView):
+    #permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        companys = Company.objects.all()
+        serializer = accounts_serializers.CompanySerializer(companys, many=True)
+        return Response(serializer.data, status=200)
+
+    def post(self, request, format=None):
+        serializer = accounts_serializers.CompanySerializer(data=request.data)
+        print(request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TaraViews(views.APIView):
+    #permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        taras = Tara.objects.all()
+        serializer = accounts_serializers.TaraSerializer(taras, many=True)
+        return Response(serializer.data, status=200)
+
+    def post(self, request, format=None):
+        serializer = accounts_serializers.TaraSerializer(data=request.data)
+        print(request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(views.APIView):
     def post(self, request, *args, **kwargs ):

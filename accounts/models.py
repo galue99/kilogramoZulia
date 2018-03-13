@@ -18,6 +18,10 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    def admin_photo(self):
+        return '<img src="%s" height="150"/>' % self.model_pic
+    admin_photo.short_description = 'Image'
+    admin_photo.allow_tags = True
 
 class Company(models.Model):
     name = models.CharField(max_length=140, blank=True, null=True)
@@ -27,6 +31,13 @@ class Company(models.Model):
     address = models.TextField(max_length=255, blank=True, null=True)
     model_pic = models.ImageField(upload_to = 'media/')
 
+
+    def __str__(self):
+        return self.name
+
+class Tara(models.Model):
+    name = models.CharField(max_length=140, blank=True, null=True)
+    peso = models.CharField(max_length=140, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -54,9 +65,11 @@ class Weight(models.Model):
     code = models.CharField(max_length=140, null=True, blank=True)
     status = models.BooleanField(default=False)
     statuss = models.CharField(max_length=50,choices=TYPE_STATUS, default=PENDING)
+    tara = models.ForeignKey('Tara', null=True, blank=True)
 
-    class Meta:
-        abstract = True
+    def incrementar(self):
+        self.code = '000' + str(self.id)
+        self.save()
 
     def __str__(self):
         return self.user.username

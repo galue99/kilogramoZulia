@@ -13,9 +13,21 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import include, url
+from django.conf.urls import url, include
 from django.contrib import admin
+from accounts import views as accounts_views
+import accounts
+
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/', include('accounts.urls')),
+    url(r'^auth/login/', accounts_views.LoginView.as_view()),
 ]
+from django.conf.urls.static import static, serve
+from kilogramo import settings
+
+if settings.DEBUG:
+    urlpatterns += [
+        url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, }),
+    ]

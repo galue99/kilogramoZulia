@@ -1,6 +1,6 @@
 __author__ = 'edgar'
 from rest_framework import serializers
-from accounts.models import User, Company, Rol, Weight
+from accounts.models import User, Company, Weight, Tara
 from django.contrib.auth.hashers import make_password
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,23 +9,23 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         fields = (
             'id',
-            'first_name',
-            'last_name'
+            'name',
+            'rif'
         )
 
-class RolSerializer(serializers.ModelSerializer):
+class TaraSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Rol
+        model = Tara
         fields = (
             'id',
             'name',
+            'peso'
         )
 
 class UserSerializer(serializers.ModelSerializer):
     company     = CompanySerializer(read_only=True)
     company_id  = serializers.IntegerField(required=True)
-    rol         = RolSerializer(read_only=True)
-    rol_id      = serializers.IntegerField(required=True)
+
     class Meta:
         model = User
         fields = (
@@ -38,8 +38,6 @@ class UserSerializer(serializers.ModelSerializer):
             'dni',
             'position',
             'branch_office',
-            'rol',
-            'rol_id',
             'company',
             'company_id',
         )
@@ -49,9 +47,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 class WeightSerializer(serializers.ModelSerializer):
     provider = CompanySerializer(read_only=True)
-    provider_id  = serializers.IntegerField(required=True)
+    provider_id = serializers.IntegerField(required=True)
     user = UserSerializer(read_only=True)
     user_id  = serializers.IntegerField(required=True)
+    tara = TaraSerializer(read_only=True)
+    tara_id  = serializers.IntegerField(required=True)
+    code = serializers.SerializerMethodField()
     class Meta:
         model = Weight
         fields = (
@@ -65,6 +66,13 @@ class WeightSerializer(serializers.ModelSerializer):
             'time',
             'user',
             'user_id',
+            'code',
             'provider',
             'provider_id',
+            'tara',
+            'tara_id',
         )
+
+    def get_code(self, obj):
+        obj.incrementar()
+        return obj.code
